@@ -1,0 +1,15 @@
+[package]
+name = "fresh_cargo"
+version = "0.0.1"
+authors = ["Whatisinternet"]
+
+[dependencies]
+twitter-api = "*"
+oauth-client = "0.1"
+hyper = "0.9.1"
+rustc-serialize = "0.3.19"
+bodyparser = "0.3.0"
+dotenv = "0.8.0"
+diesel = "0.6.1"
+diesel_codegen = { git = "https://github.com/diesel-rs/diesel.git", default-features = false, features = ["nightly", "postgres"] }
+dotenv_macros = "0.8.0"
