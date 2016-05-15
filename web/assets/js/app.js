@@ -1,4 +1,5 @@
 'use strict'
+
 var updateCrates = function() {
   $.ajax({
     url: "/feed",
@@ -33,25 +34,27 @@ window.crates = React.createClass({
         key: "Title",
         className: "white-text"
       }, "Rust crates twitter bot"),
-      React.createElement('table', {
-          key: "crates",
-          className: 'bordered'
-        },
-        this.state.crates.map(function (crate) {
-          return React.createElement('tbody', {
-              key: crate.id
-            },
-            React.createElement('tr', {
-                className: "white-text"
+      React.createElement('div', {
+        className: 'card-panel white black-text hoverable'
+      },
+
+        React.createElement('table', {
+            key: "crates",
+            className: 'bordered'
+          },
+          this.state.crates.map(function (crate) {
+            return React.createElement('tbody', {
+                key: crate.id
               },
-              React.createElement('td', {}, crate.name),
-              React.createElement('td', {}, crate.version),
-              React.createElement('td', {}, crate.description),
-              React.createElement('td', {},
-                                  React.createElement('a', {className: 'white-text', href: crate.url}, crate.url)
-                                 )
-            ))
-        }))
+              React.createElement('tr', {},
+                React.createElement('td', {},
+                                    React.createElement('a', {href: crate.url}, crate.name)
+                                  ),
+                React.createElement('td', {}, crate.version),
+                React.createElement('td', {}, crate.description)
+              ))
+          }))
+       )
     ])
   }
 });

@@ -62,7 +62,7 @@ fn main() {
     dotenv().ok();
     let mut hbse = HandlebarsEngine::new();
 
-    hbse.add(Box::new(DirectorySource::new("./templates/", ".hbs")));
+    hbse.add(Box::new(DirectorySource::new("./web/views/", ".hbs")));
 
     if let Err(r) = hbse.reload() {
         panic!("Failed to load handlebars");
@@ -80,7 +80,9 @@ fn main() {
     let mut mount = Mount::new();
     mount
         .mount("/", chain)
-        .mount("/assets/", Static::new(Path::new("./assets")));
+        .mount("/assets/", Static::new(Path::new("./web/assets")))
+        .mount("/js/", Static::new(Path::new("./web/assets/js")))
+        .mount("/css/", Static::new(Path::new("./web/assets/css")));
 
     let url = format!("0.0.0.0:{}", env::var("PORT").unwrap());
     println!("Binding on {:?}", url);
