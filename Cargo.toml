@@ -16,6 +16,10 @@ dotenv_macros = "0.8.0"
 iron = "*"
 router = "*"
 handlebars-iron = { git = "https://github.com/sunng87/handlebars-iron.git" }
+staticfile = "*"
+
+[dependencies.mount]
+git = "https://github.com/iron/mount.git"
 
 [target.heroku]
 version = "nightly"
