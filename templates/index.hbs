@@ -11,25 +11,39 @@
   <body class="orange darken-4">
     <div id="content"></div>
     <script type="text/babel">
-      var crates = React.createClass(
-      {
+      'use strict'
+
+      var crates = React.createClass({
         displayName: 'items',
         render: function () {
           var crate_data = {{{.}}}
-          return React.createElement('div', {className: "container"},
-            [
-              React.createElement('h1', {key: "Title", className: "white-text"}, "Rust crates twitter bot"),
-              React.createElement('table', {key: "crates", className: 'bordered'},
-                crate_data.crate_object.map(function(crate) {
-                  return React.createElement('tbody', {key: crate.id},
-                    React.createElement('tr', {className: "white-text"},
-                      React.createElement('td', {}, crate.name),
-                      React.createElement('td', {}, crate.version),
-                      React.createElement('td', {}, crate.description),
-                      React.createElement('td', {}, crate.url)
-                  ) ) } ) )
-            ]
-       ) } } );
+          return React.createElement('div', {
+            className: "container"
+          }, [
+            React.createElement('h1', {
+              key: "Title",
+              className: "white-text"
+            }, "Rust crates twitter bot"),
+            React.createElement('table', {
+                key: "crates",
+                className: 'bordered'
+              },
+              crate_data.crate_object.map(function (crate) {
+                return React.createElement('tbody', {
+                    key: crate.id
+                  },
+                  React.createElement('tr', {
+                      className: "white-text"
+                    },
+                    React.createElement('td', {}, crate.name),
+                    React.createElement('td', {}, crate.version),
+                    React.createElement('td', {}, crate.description),
+                    React.createElement('td', {}, crate.url)
+                  ))
+              }))
+          ])
+        }
+      });
       ReactDOM.render(
         React.createElement(crates, null),
         document.getElementById('content')
