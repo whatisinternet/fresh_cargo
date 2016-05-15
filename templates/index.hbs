@@ -5,8 +5,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react-dom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
   </head>
-  <body>
+  <body class="orange darken-4">
     <div id="content"></div>
     <script type="text/babel">
       var crates = React.createClass(
@@ -14,13 +16,18 @@
         displayName: 'items',
         render: function () {
           var crate_data = {{{.}}}
-          return React.createElement('div', {},
+          return React.createElement('div', {className: "container"},
             [
-              React.createElement('h1', {key: "Title"}, "Rust crates twitter bot"),
-              React.createElement('ul', {key: "crates"},
+              React.createElement('h1', {key: "Title", className: "white-text"}, "Rust crates twitter bot"),
+              React.createElement('table', {key: "crates", className: 'bordered'},
                 crate_data.crate_object.map(function(crate) {
-                  return React.createElement('li', {key: crate.id},
-                    crate.name) } ) )
+                  return React.createElement('tbody', {key: crate.id},
+                    React.createElement('tr', {className: "white-text"},
+                      React.createElement('td', {}, crate.name),
+                      React.createElement('td', {}, crate.version),
+                      React.createElement('td', {}, crate.description),
+                      React.createElement('td', {}, crate.url)
+                  ) ) } ) )
             ]
        ) } } );
       ReactDOM.render(
