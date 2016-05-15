@@ -4,6 +4,7 @@
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
+extern crate rustc_serialize;
 
 pub mod schema;
 pub mod models;

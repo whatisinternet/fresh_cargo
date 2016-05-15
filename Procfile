@@ -1,1 +1,1 @@
-web: target/release/show_crates
+web: target/release/web

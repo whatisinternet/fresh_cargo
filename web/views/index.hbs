@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>Fresh cargo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+  </head>
+  <body class="orange darken-4">
+    <div id="content"></div>
+    <script type="text/babel">
+      'use strict'
+      window.initial_data = {{{.}}}
+    </script>
+    <script type="text/babel" src="assets/js/app.js"></script>
+    <script type="text/babel">
+      'use strict'
+      ReactDOM.render(
+        React.createElement(window.crates, null),
+        document.getElementById('content')
+      );
+    </script>
+  </body>
+</html>
