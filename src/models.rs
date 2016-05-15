@@ -1,6 +1,7 @@
 use super::schema::crates;
 
 #[derive(Queryable)]
+#[derive(RustcDecodable, RustcEncodable)]
 pub struct Crate {
     pub id: i32,
     pub name: String,
