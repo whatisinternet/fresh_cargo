@@ -43,16 +43,18 @@ window.crates = React.createClass({
             className: 'bordered'
           },
           this.state.crates.map(function (crate) {
-            return React.createElement('tbody', {
-                key: crate.id
-              },
-              React.createElement('tr', {},
-                React.createElement('td', {},
-                                    React.createElement('a', {href: crate.url}, crate.name)
-                                  ),
-                React.createElement('td', {}, crate.version),
-                React.createElement('td', {}, crate.description)
-              ))
+            if crate.published === false {
+              return React.createElement('tbody', {
+                  key: crate.id
+                },
+                React.createElement('tr', {},
+                  React.createElement('td', {},
+                                      React.createElement('a', {href: crate.url}, crate.name)
+                                    ),
+                  React.createElement('td', {}, crate.version),
+                  React.createElement('td', {}, crate.description)
+                ))
+            }
           }))
        )
     ])
