@@ -77,7 +77,7 @@ fn main() {
         .mount("/assets/", Static::new(Path::new("./web/assets")))
         .mount("/js/", Static::new(Path::new("./web/assets/js")))
         .mount("/css/", Static::new(Path::new("./web/assets/css")))
-        .mount("/vendor/", Static::new(Path::new("./web/assets/vendor")));
+        .mount("/vendor/", Static::new(Path::new("./web/vendor")));
 
     let url = format!("0.0.0.0:{}", env::var("PORT").unwrap());
     println!("Binding on {:?}", url);
