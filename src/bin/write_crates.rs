@@ -8,7 +8,7 @@ use self::diesel::prelude::*;
 use self::fresh_cargo::*;
 use std::io::Read;
 use self::hyper::Client;
-use self::hyper::header::{ContentType};
+use self::hyper::header::ContentType;
 use self::rustc_serialize::json::Json;
 
 struct SubCrate {
@@ -19,46 +19,66 @@ struct SubCrate {
 }
 
 fn main() {
-    let connection = establish_connection();
     let new_crates = new_crates();
     let updated_crates = updated_crates();
 
     for crate_struct in new_crates.iter() {
-        if !crate_exists(crate_struct.to_owned()) {
-            let _crate = create_crate(
-                &connection,
-                &*crate_struct.name,
-                &*crate_struct.url,
-                &*crate_struct.description,
-                &*crate_struct.version,
-                );
-        }
+        crate_or_update_crate(crate_struct.to_owned());
     }
 
     for crate_struct in updated_crates.iter() {
-        if !crate_exists(crate_struct.to_owned()) {
-            let _crate = create_crate(
-                &connection,
-                &*crate_struct.name,
-                &*crate_struct.url,
-                &*crate_struct.description,
-                &*crate_struct.version,
-                );
-        }
+        crate_or_update_crate(crate_struct.to_owned());
     }
 
 }
 
-fn crate_exists(crate_struct: &SubCrate) -> bool {
+fn crate_or_update_crate(crate_struct: &SubCrate) -> Crate {
+    if crate_exists(crate_struct.to_owned()) {
+        return update_crate(crate_struct.to_owned());
+    } else {
+        let connection = establish_connection();
+        return create_crate(&connection,
+                            &*crate_struct.name,
+                            &*crate_struct.url,
+                            &*crate_struct.description,
+                            &*crate_struct.version);
+    }
+}
+
+fn update_crate(crate_struct: &SubCrate) -> Crate {
+    use fresh_cargo::schema::crates::dsl::{crates, published, version};
+    let connection = establish_connection();
+
+    let updatable = find_crate(crate_struct.to_owned()).first().unwrap().id;
+    let crate_version = find_crate(crate_struct.to_owned()).first().unwrap().version.to_owned();
+
+    let return_crate = diesel::update(crates.find(updatable))
+        .set(version.eq(&*crate_struct.version))
+        .get_result::<Crate>(&connection)
+        .expect(&format!("Unable to find crate"));
+
+    if crate_struct.version != crate_version {
+        return diesel::update(crates.find(updatable))
+            .set(published.eq(false))
+            .get_result::<Crate>(&connection)
+            .expect(&format!("Unable to find crate"));
+    } else {
+        return return_crate;
+    }
+}
+
+fn find_crate(crate_struct: &SubCrate) -> Vec<Crate> {
     use fresh_cargo::schema::crates::dsl::*;
     let connection = establish_connection();
 
-    let results = crates
-        .filter(name.eq(crate_struct.name.to_owned()))
-        .filter(version.eq(crate_struct.version.to_owned()))
+    return crates.filter(name.eq(crate_struct.name.to_owned()))
         .limit(1)
         .load::<Crate>(&connection)
         .expect("Error loading crates");
+}
+
+fn crate_exists(crate_struct: &SubCrate) -> bool {
+    let results = find_crate(crate_struct);
     if results.len() > 0 {
         return true;
     } else {
@@ -69,66 +89,59 @@ fn crate_exists(crate_struct: &SubCrate) -> bool {
 fn updated_crates() -> Vec<SubCrate> {
     let client = Client::new();
 
-    let mut result = client
-        .get("https://crates.io/summary")
+    let mut result = client.get("https://crates.io/summary")
         .header(ContentType::json())
         .send()
         .unwrap();
 
     let mut body = String::new();
-    result
-        .read_to_string(&mut body)
+    result.read_to_string(&mut body)
         .unwrap();
 
     let json = Json::from_str(&body).unwrap();
     let new_crates = get_just_updated(json.to_owned());
 
-    return new_crates
-        .iter()
-        .map(|crate_json|
-                SubCrate {
-                        name:           get_string_key(crate_json.to_owned(), "name"),
-                        url:            get_url(crate_json.to_owned()),
-                        description:    get_string_key(crate_json.to_owned(), "description"),
-                        version:        get_string_key(crate_json.to_owned(), "max_version")
-                }
-             )
+    return new_crates.iter()
+        .map(|crate_json| {
+            SubCrate {
+                name: get_string_key(crate_json.to_owned(), "name"),
+                url: get_url(crate_json.to_owned()),
+                description: get_string_key(crate_json.to_owned(), "description"),
+                version: get_string_key(crate_json.to_owned(), "max_version"),
+            }
+        })
         .collect();
 }
 
 fn new_crates() -> Vec<SubCrate> {
     let client = Client::new();
 
-    let mut result = client
-        .get("https://crates.io/summary")
+    let mut result = client.get("https://crates.io/summary")
         .header(ContentType::json())
         .send()
         .unwrap();
 
     let mut body = String::new();
-    result
-        .read_to_string(&mut body)
+    result.read_to_string(&mut body)
         .unwrap();
 
     let json = Json::from_str(&body).unwrap();
     let new_crates = get_new_crates(json.to_owned());
 
-    return new_crates
-        .iter()
-        .map(|crate_json|
-                SubCrate {
-                        name:           get_string_key(crate_json.to_owned(), "name"),
-                        url:            get_url(crate_json.to_owned()),
-                        description:    get_string_key(crate_json.to_owned(), "description"),
-                        version:        get_string_key(crate_json.to_owned(), "max_version")
-                }
-             )
+    return new_crates.iter()
+        .map(|crate_json| {
+            SubCrate {
+                name: get_string_key(crate_json.to_owned(), "name"),
+                url: get_url(crate_json.to_owned()),
+                description: get_string_key(crate_json.to_owned(), "description"),
+                version: get_string_key(crate_json.to_owned(), "max_version"),
+            }
+        })
         .collect();
 }
 
 fn get_new_crates(json: Json) -> Vec<Json> {
-    return json
-        .find_path(&["new_crates"])
+    return json.find_path(&["new_crates"])
         .unwrap()
         .as_array()
         .unwrap()
@@ -136,8 +149,7 @@ fn get_new_crates(json: Json) -> Vec<Json> {
 }
 
 fn get_just_updated(json: Json) -> Vec<Json> {
-    return json
-        .find_path(&["just_updated"])
+    return json.find_path(&["just_updated"])
         .unwrap()
         .as_array()
         .unwrap()
@@ -149,8 +161,7 @@ fn get_url(json: Json) -> String {
 }
 
 fn get_string_key(json: Json, key: &str) -> String {
-    return json
-        .find_path(&[key])
+    return json.find_path(&[key])
         .unwrap()
         .to_string()
         .replace("\"", "");

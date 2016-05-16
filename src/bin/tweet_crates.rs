@@ -34,9 +34,12 @@ fn main() {
 
     let config = Config {
         consumer_key: env::var("TWITTER_CONSUMER_KEY").expect("TWITTER_CONSUMER_KEY must be set"),
-        consumer_secret: env::var("TWITTER_CONSUMER_SECRET").expect("TWITTER_CONSUMER_SECRET must be set"),
-        access_key: env::var("TWITTER_ACCESS_TOKEN_KEY").expect("TWITTER_ACCESS_TOKEN_KEY must be set"),
-        access_secret: env::var("TWITTER_ACCESS_TOKEN_SECRET").expect("TWITTER_ACCESS_TOKEN_SECRET must be set"),
+        consumer_secret: env::var("TWITTER_CONSUMER_SECRET")
+            .expect("TWITTER_CONSUMER_SECRET must be set"),
+        access_key: env::var("TWITTER_ACCESS_TOKEN_KEY")
+            .expect("TWITTER_ACCESS_TOKEN_KEY must be set"),
+        access_secret: env::var("TWITTER_ACCESS_TOKEN_SECRET")
+            .expect("TWITTER_ACCESS_TOKEN_SECRET must be set"),
     };
 
     let consumer = Token::new(config.consumer_key, config.consumer_secret);
@@ -53,16 +56,13 @@ fn main() {
 }
 
 fn build_tweet(crate_struct: Crate) -> String {
-    let mut tweet = format!(
-        "{} ({}) {} {}",
-        crate_struct.name,
-        crate_struct.version,
-        crate_struct.description,
-        crate_struct.url
-        );
+    let mut tweet = format!("{} ({}) {}",
+                            crate_struct.name,
+                            crate_struct.version,
+                            crate_struct.description);
     if tweet.len() > 130 {
         tweet.truncate(130);
-        tweet = format!("{}...", tweet);
+        tweet = format!("{}... {}", tweet, crate_struct.url);
     }
-    return tweet;
+    return format!("{} {}", tweet, crate_struct.url);
 }

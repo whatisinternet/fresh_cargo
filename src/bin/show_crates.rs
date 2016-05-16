@@ -9,8 +9,7 @@ fn main() {
     use fresh_cargo::schema::crates::dsl::*;
 
     let connection = establish_connection();
-    let results = crates
-        .load::<Crate>(&connection)
+    let results = crates.load::<Crate>(&connection)
         .expect("Error loading crates");
 
     println!("Displaying {} crates", results.len());
@@ -19,7 +18,6 @@ fn main() {
                  _crate.name,
                  _crate.version,
                  _crate.published,
-                 _crate.description
-                 );
+                 _crate.description);
     }
 }
