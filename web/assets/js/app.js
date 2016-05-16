@@ -43,7 +43,7 @@ window.crates = React.createClass({
             className: 'bordered'
           },
           this.state.crates.map(function (crate) {
-            if crate.published === false {
+            if (crate.published === false) {
               return React.createElement('tbody', {
                   key: crate.id
                 },
