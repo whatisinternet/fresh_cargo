@@ -48,6 +48,11 @@ window.crates = React.createClass({
         className: "waves-effect waves-light btn white black-text hoverable",
         onClick: function(e) {this.setState({show_all: !this.state.show_all})}.bind(this)
       }, this.state.show_all === false ? "Show all" : "Show untweeted"),
+      React.createElement('a', {
+        key: "fetch",
+        className: "right waves-effect waves-light btn white black-text hoverable",
+        onClick: updateCrates.bind(this)
+      }, "Update list"),
       React.createElement('div', {
         key: "Wrapper",
         className: 'card-panel white black-text hoverable'
@@ -55,7 +60,7 @@ window.crates = React.createClass({
         React.createElement('h5', {
           key: "Title",
           className: "black-text"
-        }, "Crates:"),
+        }, this.state.show_all === false ? "Showing untweeted" : "Showing all crates"),
 
         React.createElement('table', {
             key: "crates",
@@ -73,7 +78,7 @@ window.crates = React.createClass({
                 React.createElement('td', {}, crate.description)
               ))
           }))
-       )
+       ),
     ])
   }
 });
