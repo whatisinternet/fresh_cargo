@@ -35,6 +35,7 @@ window.crates = React.createClass({
         className: "white-text"
       }, "Rust crates twitter bot"),
       React.createElement('div', {
+        key: "Wrapper",
         className: 'card-panel white black-text hoverable'
       },
 
@@ -53,6 +54,13 @@ window.crates = React.createClass({
                                     ),
                   React.createElement('td', {}, crate.version),
                   React.createElement('td', {}, crate.description)
+                ))
+            } else {
+              return React.createElement('tbody', {
+                  key: crate.id
+                },
+                React.createElement('tr', {},
+                  React.createElement('td', {}, "No untweeted crates")
                 ))
             }
           }))
