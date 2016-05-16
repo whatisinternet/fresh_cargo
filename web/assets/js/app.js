@@ -22,11 +22,13 @@ window.crates = React.createClass({
   },
 
   componentDidMount: function () {
-    var that = this
     setInterval(updateCrates.bind(this), 1800000)
   },
 
   render: function () {
+    var publishable = this.state.filter(function(crate) {
+      return crate.published === false
+    })
     return React.createElement('div', {
       className: "container"
     }, [
@@ -43,26 +45,17 @@ window.crates = React.createClass({
             key: "crates",
             className: 'bordered'
           },
-          this.state.crates.map(function (crate) {
-            if (crate.published === false) {
-              return React.createElement('tbody', {
-                  key: crate.id
-                },
-                React.createElement('tr', {},
-                  React.createElement('td', {},
-                                      React.createElement('a', {href: crate.url}, crate.name)
-                                    ),
-                  React.createElement('td', {}, crate.version),
-                  React.createElement('td', {}, crate.description)
-                ))
-            } else {
-              return React.createElement('tbody', {
-                  key: crate.id
-                },
-                React.createElement('tr', {},
-                  React.createElement('td', {}, "No untweeted crates")
-                ))
-            }
+          publishable.map(function (crate) {
+            return React.createElement('tbody', {
+                key: crate.id
+              },
+              React.createElement('tr', {},
+                React.createElement('td', {},
+                                    React.createElement('a', {href: crate.url}, crate.name)
+                                  ),
+                React.createElement('td', {}, crate.version),
+                React.createElement('td', {}, crate.description)
+              ))
           }))
        )
     ])

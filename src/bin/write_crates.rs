@@ -23,19 +23,21 @@ fn main() {
     let updated_crates = updated_crates();
 
     for crate_struct in new_crates.iter() {
-        crate_or_update_crate(crate_struct.to_owned());
+        create_or_update_crate(crate_struct.to_owned());
     }
 
     for crate_struct in updated_crates.iter() {
-        crate_or_update_crate(crate_struct.to_owned());
+        create_or_update_crate(crate_struct.to_owned());
     }
 
 }
 
-fn crate_or_update_crate(crate_struct: &SubCrate) -> Crate {
+fn create_or_update_crate(crate_struct: &SubCrate) -> Crate {
     if crate_exists(crate_struct.to_owned()) {
+        println!("Updating: {}", crate_struct.name);
         return update_crate(crate_struct.to_owned());
     } else {
+        println!("Creating: {}", crate_struct.name);
         let connection = establish_connection();
         return create_crate(&connection,
                             &*crate_struct.name,
@@ -48,23 +50,24 @@ fn crate_or_update_crate(crate_struct: &SubCrate) -> Crate {
 fn update_crate(crate_struct: &SubCrate) -> Crate {
     use fresh_cargo::schema::crates::dsl::{crates, published, version};
     let connection = establish_connection();
+    let connection_two = establish_connection();
 
-    let updatable = find_crate(crate_struct.to_owned()).first().unwrap().id;
-    let crate_version = find_crate(crate_struct.to_owned()).first().unwrap().version.to_owned();
+    let updatable = find_crate(crate_struct.to_owned()).remove(0).id;
+    let crate_version = find_crate(crate_struct.to_owned()).remove(0).version.to_owned();
+    let mut should_publish = false;
+    if crate_struct.version != crate_version {
+        should_publish = true;
+    }
 
-    let return_crate = diesel::update(crates.find(updatable))
+    let updated = diesel::update(crates.find(updatable))
         .set(version.eq(&*crate_struct.version))
         .get_result::<Crate>(&connection)
         .expect(&format!("Unable to find crate"));
 
-    if crate_struct.version != crate_version {
-        return diesel::update(crates.find(updatable))
-            .set(published.eq(false))
-            .get_result::<Crate>(&connection)
-            .expect(&format!("Unable to find crate"));
-    } else {
-        return return_crate;
-    }
+    return diesel::update(crates.find(updated.id))
+        .set(published.eq(&should_publish))
+        .get_result::<Crate>(&connection_two)
+        .expect(&format!("Unable to find crate"));
 }
 
 fn find_crate(crate_struct: &SubCrate) -> Vec<Crate> {
