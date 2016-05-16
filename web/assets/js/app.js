@@ -26,7 +26,7 @@ window.crates = React.createClass({
   },
 
   render: function () {
-    var publishable = this.state.filter(function(crate) {
+    var publishable = this.state.crates.filter(function(crate) {
       return crate.published === false
     })
     return React.createElement('div', {
