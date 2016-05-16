@@ -17,7 +17,8 @@ window.crates = React.createClass({
 
   getInitialState: function() {
     return {
-      crates: window.initial_data.crate_object
+      crates: window.initial_data.crate_object,
+      show_all: false
     };
   },
 
@@ -26,9 +27,15 @@ window.crates = React.createClass({
   },
 
   render: function () {
-    var publishable = this.state.crates.filter(function(crate) {
-      return crate.published === false
-    })
+
+    if (this.state.show_all === false) {
+      var publishable = this.state.crates.filter(function(crate) {
+        return crate.published === false
+      })
+    } else {
+      var publishable = this.state.crates
+    }
+
     return React.createElement('div', {
       className: "container"
     }, [
@@ -36,6 +43,11 @@ window.crates = React.createClass({
         key: "Title",
         className: "white-text"
       }, "Rust crates twitter bot"),
+      React.createElement('a', {
+        key: "all",
+        className: "waves-effect waves-light btn white black-text hoverable",
+        onClick: function(e) {this.setState({show_all: !this.state.show_all})}.bind(this)
+      }, this.state.show_all === false ? "Show all" : "Show untweeted"),
       React.createElement('div', {
         key: "Wrapper",
         className: 'card-panel white black-text hoverable'
@@ -43,7 +55,7 @@ window.crates = React.createClass({
         React.createElement('h5', {
           key: "Title",
           className: "black-text"
-        }, "Waiting to be tweeted"),
+        }, "Crates:"),
 
         React.createElement('table', {
             key: "crates",
