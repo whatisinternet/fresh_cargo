@@ -66,7 +66,7 @@ fn build_tweet(crate_struct: Crate) -> String {
     }
     tweet = format!("{} {}", tweet, crate_struct.url);
     if tweet.len() > 140 {
-        tweet.truncate(135);
+        tweet.truncate(125);
         tweet = format!("{}...", tweet);
     }
     return tweet
