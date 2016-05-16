@@ -19,46 +19,69 @@ struct SubCrate {
 }
 
 fn main() {
-    let connection = establish_connection();
     let new_crates = new_crates();
     let updated_crates = updated_crates();
 
     for crate_struct in new_crates.iter() {
-        if !crate_exists(crate_struct.to_owned()) {
-            let _crate = create_crate(
-                &connection,
-                &*crate_struct.name,
-                &*crate_struct.url,
-                &*crate_struct.description,
-                &*crate_struct.version,
-                );
-        }
+        crate_or_update_crate(crate_struct.to_owned());
     }
 
     for crate_struct in updated_crates.iter() {
-        if !crate_exists(crate_struct.to_owned()) {
-            let _crate = create_crate(
-                &connection,
-                &*crate_struct.name,
-                &*crate_struct.url,
-                &*crate_struct.description,
-                &*crate_struct.version,
-                );
-        }
+        crate_or_update_crate(crate_struct.to_owned());
     }
 
 }
 
-fn crate_exists(crate_struct: &SubCrate) -> bool {
+fn crate_or_update_crate(crate_struct: &SubCrate) -> Crate {
+    if crate_exists(crate_struct.to_owned()) {
+        return update_crate(crate_struct.to_owned());
+    } else {
+        let connection = establish_connection();
+        return create_crate(
+            &connection,
+            &*crate_struct.name,
+            &*crate_struct.url,
+            &*crate_struct.description,
+            &*crate_struct.version,
+            );
+    }
+}
+
+fn update_crate(crate_struct: &SubCrate) -> Crate {
+    use fresh_cargo::schema::crates::dsl::{crates, published, version};
+    let connection = establish_connection();
+
+    let updatable = find_crate(crate_struct.to_owned()).first().unwrap().id;
+    let crate_version = find_crate(crate_struct.to_owned()).first().unwrap().version.to_owned();
+
+    let return_crate = diesel::update(crates.find(updatable))
+        .set(version.eq(&*crate_struct.version))
+        .get_result::<Crate>(&connection)
+        .expect(&format!("Unable to find crate"));
+
+    if crate_struct.version != crate_version {
+        return diesel::update(crates.find(updatable))
+            .set(published.eq(false))
+            .get_result::<Crate>(&connection)
+            .expect(&format!("Unable to find crate"));
+    } else {
+        return return_crate;
+    }
+}
+
+fn find_crate(crate_struct: &SubCrate) -> Vec<Crate> {
     use fresh_cargo::schema::crates::dsl::*;
     let connection = establish_connection();
 
-    let results = crates
+    return crates
         .filter(name.eq(crate_struct.name.to_owned()))
-        .filter(version.eq(crate_struct.version.to_owned()))
         .limit(1)
         .load::<Crate>(&connection)
         .expect("Error loading crates");
+}
+
+fn crate_exists(crate_struct: &SubCrate) -> bool {
+    let results = find_crate(crate_struct);
     if results.len() > 0 {
         return true;
     } else {

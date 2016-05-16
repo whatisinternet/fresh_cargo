@@ -54,15 +54,14 @@ fn main() {
 
 fn build_tweet(crate_struct: Crate) -> String {
     let mut tweet = format!(
-        "{} ({}) {} {}",
+        "{} ({}) {}",
         crate_struct.name,
         crate_struct.version,
-        crate_struct.description,
-        crate_struct.url
+        crate_struct.description
         );
     if tweet.len() > 130 {
         tweet.truncate(130);
-        tweet = format!("{}...", tweet);
+        tweet = format!("{}... {}", tweet, crate_struct.url);
     }
-    return tweet;
+    return format!("{} {}", tweet, crate_struct.url);
 }
