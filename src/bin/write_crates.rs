@@ -1,12 +1,10 @@
 #![feature(custom_derive, custom_attribute, plugin)]
 #![plugin(diesel_codegen)]
 
-#[macro_use]
 extern crate diesel;
 extern crate fresh_cargo;
 extern crate hyper;
 extern crate rustc_serialize;
-
 
 use self::fresh_cargo::models::*;
 use self::diesel::prelude::*;
@@ -16,8 +14,6 @@ use self::hyper::Client;
 use self::hyper::header::ContentType;
 use self::rustc_serialize::json::Json;
 use self::fresh_cargo::schema::crates;
-
-
 
 #[changeset_for(crates)]
 struct SubCrate {
@@ -96,7 +92,6 @@ fn crate_exists(crate_struct: &SubCrate) -> bool {
 }
 
 fn updated_crates() -> Vec<SubCrate> {
-    use fresh_cargo::schema::crates::dsl::*;
     let client = Client::new();
 
     let mut result = client.get("https://crates.io/summary")
@@ -110,8 +105,6 @@ fn updated_crates() -> Vec<SubCrate> {
 
     let json = Json::from_str(&body).unwrap();
     let new_crates = get_just_updated(json.to_owned());
-
-    let connection = establish_connection();
 
     return new_crates.iter()
         .map(|crate_json| {
