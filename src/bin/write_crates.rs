@@ -1,11 +1,13 @@
 #![feature(custom_derive, custom_attribute, plugin)]
 #![plugin(diesel_codegen)]
 
+#[macro_use]
 extern crate fresh_cargo;
 extern crate diesel;
 extern crate hyper;
 extern crate rustc_serialize;
 extern crate diesel_codegen;
+
 
 use self::fresh_cargo::models::*;
 use self::diesel::prelude::*;
@@ -15,6 +17,8 @@ use self::hyper::Client;
 use self::hyper::header::ContentType;
 use self::rustc_serialize::json::Json;
 use self::fresh_cargo::schema::crates;
+
+
 
 #[changeset_for(crates)]
 struct SubCrate {
