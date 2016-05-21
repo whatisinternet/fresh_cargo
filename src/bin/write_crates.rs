@@ -2,11 +2,10 @@
 #![plugin(diesel_codegen)]
 
 #[macro_use]
-extern crate fresh_cargo;
 extern crate diesel;
+extern crate fresh_cargo;
 extern crate hyper;
 extern crate rustc_serialize;
-extern crate diesel_codegen;
 
 
 use self::fresh_cargo::models::*;
