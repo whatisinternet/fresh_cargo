@@ -36,6 +36,7 @@ pub fn create_crate<'a>(conn: &PgConnection,
         url: url,
         description: description,
         version: version,
+        published: false,
     };
 
     diesel::insert(&new_crate)
