@@ -178,7 +178,7 @@ fn get_url(json: Json) -> String {
 
 fn get_string_key(json: Json, key: &str) -> String {
     return json.find_path(&[key])
-        .unwrap()
+        .unwrap_or("".to_string())
         .to_string()
         .replace("\"", "");
 }
