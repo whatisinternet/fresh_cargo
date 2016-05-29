@@ -18,7 +18,7 @@ window.crates = React.createClass({
   getInitialState: function() {
     return {
       crates: window.initial_data.crate_object,
-      show_all: false
+      show_all: true
     };
   },
 
