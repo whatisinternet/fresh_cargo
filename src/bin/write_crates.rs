@@ -158,7 +158,7 @@ fn new_crates() -> Vec<SubCrate> {
 
 fn get_new_crates(json: Json) -> Vec<Json> {
     return json.find_path(&["new_crates"])
-        .unwrap()
+        .unwrap_or(&Json::from_str("[]").unwrap())
         .as_array()
         .unwrap()
         .to_owned();
@@ -166,7 +166,7 @@ fn get_new_crates(json: Json) -> Vec<Json> {
 
 fn get_just_updated(json: Json) -> Vec<Json> {
     return json.find_path(&["just_updated"])
-        .unwrap()
+        .unwrap_or(&Json::from_str("[]").unwrap())
         .as_array()
         .unwrap()
         .to_owned();
@@ -178,7 +178,7 @@ fn get_url(json: Json) -> String {
 
 fn get_string_key(json: Json, key: &str) -> String {
     return json.find_path(&[key])
-        .unwrap_or(&Json::from_str("").unwrap())
+        .unwrap_or(&Json::from_str("\"nothing\"").unwrap())
         .to_string()
         .replace("\"", "");
 }
