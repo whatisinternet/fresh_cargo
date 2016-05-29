@@ -8,6 +8,7 @@ extern crate rustc_serialize;
 
 use self::fresh_cargo::models::*;
 use self::diesel::prelude::*;
+use diesel::pg::PgConnection;
 use self::fresh_cargo::*;
 use std::io::Read;
 use self::hyper::Client;
@@ -33,57 +34,61 @@ impl SubCrate {
 fn main() {
     let new_crates = new_crates();
     let updated_crates = updated_crates();
+    let connection = establish_connection();
 
     for crate_struct in new_crates.iter() {
-        create_or_update_crate(crate_struct.to_owned());
+        create_or_update_crate(crate_struct.to_owned(), &connection);
     }
 
     for crate_struct in updated_crates.iter() {
-        create_or_update_crate(crate_struct.to_owned());
+        create_or_update_crate(crate_struct.to_owned(), &connection);
     }
 
 }
 
-fn create_or_update_crate(crate_struct: &SubCrate) -> Crate {
-    if crate_exists(crate_struct.to_owned()) {
+fn create_or_update_crate(crate_struct: &SubCrate, connection: &PgConnection) {
+    if crate_exists(crate_struct.to_owned(), connection) {
         println!("Updating: {}", crate_struct.name);
-        return update_crate(crate_struct.to_owned());
+        println!("        : {}", crate_struct.url);
+        println!("        : {}", crate_struct.description);
+        println!("        : {}", crate_struct.version);
+        update_crate(crate_struct.to_owned(), connection);
     } else {
         println!("Creating: {}", crate_struct.name);
-        let connection = establish_connection();
-        return create_crate(&connection,
-                            &*crate_struct.name,
-                            &*crate_struct.url,
-                            &*crate_struct.description,
-                            &*crate_struct.version);
+        println!("        : {}", crate_struct.url);
+        println!("        : {}", crate_struct.description);
+        println!("        : {}", crate_struct.version);
+        create_crate(connection,
+                        &*crate_struct.name,
+                        &*crate_struct.url,
+                        &*crate_struct.description,
+                        &*crate_struct.version);
     }
 }
 
-fn update_crate(crate_struct: &SubCrate) -> Crate {
+fn update_crate(crate_struct: &SubCrate, connection: &PgConnection) -> Crate {
     use fresh_cargo::schema::crates::dsl::*;
-    let connection = establish_connection();
-    let updatable = find_crate(crate_struct.to_owned()).remove(0).id;
+    let updatable = find_crate(crate_struct.to_owned(), connection).remove(0).id;
     return diesel::update(crates.find(updatable))
         .set(crate_struct)
-        .get_result::<Crate>(&connection)
+        .get_result::<Crate>(connection)
         .expect(&format!("Unable to update"));
 
 
 }
 
-fn find_crate(crate_struct: &SubCrate) -> Vec<Crate> {
+fn find_crate(crate_struct: &SubCrate, connection: &PgConnection) -> Vec<Crate> {
     use fresh_cargo::schema::crates::dsl::*;
-    let connection = establish_connection();
 
     return crates
         .filter(name.eq(crate_struct.name.to_owned()))
         .limit(1)
-        .load::<Crate>(&connection)
+        .load::<Crate>(connection)
         .expect("Error loading crates");
 }
 
-fn crate_exists(crate_struct: &SubCrate) -> bool {
-    let results = find_crate(crate_struct);
+fn crate_exists(crate_struct: &SubCrate, connection: &PgConnection) -> bool {
+    let results = find_crate(crate_struct, connection);
     if results.len() > 0 {
         return true;
     } else {
@@ -93,6 +98,7 @@ fn crate_exists(crate_struct: &SubCrate) -> bool {
 
 fn updated_crates() -> Vec<SubCrate> {
     let client = Client::new();
+    let connection = establish_connection();
 
     let mut result = client.get("https://crates.io/summary")
         .header(ContentType::json())
@@ -115,8 +121,8 @@ fn updated_crates() -> Vec<SubCrate> {
                 version: get_string_key(crate_json.to_owned(), "max_version"),
                 published: false,
             };
-            if crate_exists(&temp_crate) {
-                let crate_version = find_crate(&temp_crate).remove(0).version;
+            if crate_exists(&temp_crate, &connection) {
+                let crate_version = find_crate(&temp_crate, &connection).remove(0).version;
                 if temp_crate.version != crate_version {
                     temp_crate.published = false;
                 } else {
