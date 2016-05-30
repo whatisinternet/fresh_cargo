@@ -1,4 +1,6 @@
+#![deny(warnings)]
 #![feature(custom_derive, custom_attribute, plugin)]
+#![plugin(diesel_codegen)]
 #![plugin(diesel_codegen, dotenv_macros)]
 
 #[macro_use]
@@ -8,6 +10,7 @@ extern crate rustc_serialize;
 
 pub mod schema;
 pub mod models;
+pub mod fetch_crates;
 
 use diesel::prelude::*;
 use diesel::pg::PgConnection;

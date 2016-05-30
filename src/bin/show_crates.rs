@@ -1,3 +1,4 @@
+#![deny(warnings)]
 extern crate fresh_cargo;
 extern crate diesel;
 
