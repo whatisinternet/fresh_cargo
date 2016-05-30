@@ -59,10 +59,10 @@ fn create_or_update_crate(crate_struct: &SubCrate, connection: &PgConnection) {
         println!("        : {}", crate_struct.description);
         println!("        : {}", crate_struct.version);
         create_crate(connection,
-                        &*crate_struct.name,
-                        &*crate_struct.url,
-                        &*crate_struct.description,
-                        &*crate_struct.version);
+                     &*crate_struct.name,
+                     &*crate_struct.url,
+                     &*crate_struct.description,
+                     &*crate_struct.version);
     }
 }
 
@@ -80,8 +80,7 @@ fn update_crate(crate_struct: &SubCrate, connection: &PgConnection) -> Crate {
 fn find_crate(crate_struct: &SubCrate, connection: &PgConnection) -> Vec<Crate> {
     use fresh_cargo::schema::crates::dsl::*;
 
-    return crates
-        .filter(name.eq(crate_struct.name.to_owned()))
+    return crates.filter(name.eq(crate_struct.name.to_owned()))
         .limit(1)
         .load::<Crate>(connection)
         .expect("Error loading crates");
@@ -114,7 +113,7 @@ fn updated_crates() -> Vec<SubCrate> {
 
     return new_crates.iter()
         .map(|crate_json| {
-            let mut temp_crate =  SubCrate {
+            let mut temp_crate = SubCrate {
                 name: get_string_key(crate_json.to_owned(), "name"),
                 url: get_url(crate_json.to_owned()),
                 description: get_string_key(crate_json.to_owned(), "description"),
@@ -129,7 +128,7 @@ fn updated_crates() -> Vec<SubCrate> {
                     temp_crate.publish_setting(true);
                 }
             }
-            return temp_crate
+            return temp_crate;
         })
         .collect();
 }

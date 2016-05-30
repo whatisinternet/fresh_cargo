@@ -65,5 +65,5 @@ fn build_tweet(crate_struct: Crate) -> String {
         tweet.truncate(130);
         tweet = format!("{}...", tweet);
     }
-    return tweet
+    return tweet;
 }
