@@ -1,3 +1,4 @@
+#![deny(warnings)]
 extern crate fresh_cargo;
 extern crate diesel;
 extern crate oauth_client as oauth;
@@ -65,5 +66,5 @@ fn build_tweet(crate_struct: Crate) -> String {
         tweet.truncate(130);
         tweet = format!("{}...", tweet);
     }
-    return tweet
+    return tweet;
 }

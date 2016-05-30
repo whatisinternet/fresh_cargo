@@ -1,3 +1,4 @@
+#![deny(warnings)]
 extern crate iron;
 extern crate router;
 extern crate handlebars_iron as hbs;
@@ -11,7 +12,7 @@ extern crate mount;
 use self::iron::prelude::*;
 use self::iron::status;
 use self::router::Router;
-use self::hbs::{Template, HandlebarsEngine, DirectorySource, MemorySource};
+use self::hbs::{Template, HandlebarsEngine, DirectorySource};
 use self::dotenv::dotenv;
 use self::rustc_serialize::json;
 use self::fresh_cargo::*;
@@ -60,7 +61,7 @@ fn main() {
     hbse.add(Box::new(DirectorySource::new("./web/views/", ".hbs")));
 
     if let Err(r) = hbse.reload() {
-        panic!("Failed to load handlebars");
+        panic!("Failed to load handlebars, {}", r);
     }
 
     let mut router = Router::new();
