@@ -40,6 +40,7 @@ fn index(_: &mut Request) -> IronResult<Response> {
     resp.set_mut(Template::new("index", json::encode(&encodeable_crate).unwrap()))
         .set_mut(status::Ok);
     println!("{}", resp);
+    println!("Render: Index");
     Ok(resp)
 }
 
@@ -51,6 +52,7 @@ fn feed(_: &mut Request) -> IronResult<Response> {
     let encodeable_crate = EncodeableCrates { crate_object: results };
     let mut resp = Response::new();
     resp.set_mut(json::encode(&encodeable_crate).unwrap().to_owned()).set_mut(status::Ok);
+    println!("Render: Feed");
     return Ok(resp);
 }
 
@@ -61,7 +63,7 @@ fn main() {
     hbse.add(Box::new(DirectorySource::new("./web/views/", ".hbs")));
 
     if let Err(r) = hbse.reload() {
-        panic!("Failed to load handlebars, {}", r);
+        panic!(format!("Failed to load handlebars, {}", r));
     }
 
     let mut router = Router::new();
