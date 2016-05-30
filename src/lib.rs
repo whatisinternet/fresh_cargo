@@ -11,6 +11,7 @@ extern crate rustc_serialize;
 pub mod schema;
 pub mod models;
 pub mod fetch_crates;
+pub mod create_update;
 
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
