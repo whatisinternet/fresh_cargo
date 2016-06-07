@@ -75,7 +75,7 @@ window.crates = React.createClass({
                                     React.createElement('a', {href: crate.url}, crate.name)
                                   ),
                 React.createElement('td', {}, crate.version),
-                React.createElement('td', {}, crate.description)
+                React.createElement('td', {}, crate.description.substring(0, 100))
               ))
           }))
        ),
