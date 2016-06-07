@@ -12,6 +12,8 @@ use self::fresh_cargo::*;
 use self::fresh_cargo::models::*;
 use self::diesel::prelude::*;
 use self::oauth::Token;
+use std::thread::sleep;
+use std::time::Duration;
 use dotenv::dotenv;
 use std::env;
 
@@ -52,6 +54,7 @@ fn main() {
             .get_result::<Crate>(&connection)
             .expect(&format!("Unable to find crate {}", _crate.id));
         let status = &*build_tweet(updated_crate);
+        sleep(Duration::from_millis(500));
         twitter::update_status(&consumer, &access, status).unwrap();
     }
 }
