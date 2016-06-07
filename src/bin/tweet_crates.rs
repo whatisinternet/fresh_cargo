@@ -1,4 +1,4 @@
-#![deny(warnings)]
+// #![deny(warnings)]
 extern crate fresh_cargo;
 extern crate diesel;
 extern crate oauth_client as oauth;
@@ -55,7 +55,10 @@ fn main() {
             .expect(&format!("Unable to find crate {}", _crate.id));
         let status = &*build_tweet(updated_crate);
         sleep(Duration::from_millis(500));
-        twitter::update_status(&consumer, &access, status).unwrap();
+        match twitter::update_status(&consumer, &access, status) {
+            Ok(v) => println!("Tweeted!"),
+            Err(e) => println!("FAILED"),
+        };
     }
 }
 
