@@ -39,10 +39,16 @@ window.crates = React.createClass({
     return React.createElement('div', {
       className: "container"
     }, [
-      React.createElement('h1', {
-        key: "Title",
-        className: "white-text"
-      }, "Rust crates twitter bot"),
+      React.createElement('a', {
+        key: "twitter",
+        href: "https://twitter.com/RustCrates",
+      }, [
+        React.createElement('h1', {
+          key: "Title",
+          className: "white-text"
+        }, "Rust crates twitter bot"),
+      ]
+                         ),
       React.createElement('a', {
         key: "all",
         className: "waves-effect waves-light btn white black-text hoverable",
