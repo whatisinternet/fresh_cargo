@@ -1,7 +1,7 @@
 use super::schema::crates;
 use super::diesel::*;
 
-#[derive(Queryable)]
+#[derive(Clone, Queryable)]
 #[derive(RustcDecodable, RustcEncodable)]
 #[changeset_for(crates)]
 pub struct Crate {

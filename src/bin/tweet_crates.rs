@@ -50,20 +50,22 @@ fn main() {
     let access = Token::new(config.access_key, config.access_secret);
 
     for _crate in results {
-        let status = &*build_tweet(_crate);
+        let status = &*build_tweet(_crate.clone());
         sleep(Duration::from_millis(500));
+        let crate_id = _crate.clone().id;
         match twitter::update_status(&consumer, &access, status) {
-            Ok(v) => publish_crate(_crate, &connection),
+            Ok(v) => publish_crate(crate_id, &connection),
             Err(e) => println!("FAILED"),
         };
     }
 }
 
-fn publish_crate(_crate: Crate, connection: &PgConnection) {
-    diesel::update(crates.find(_crate.id))
+fn publish_crate(crate_id: i32, connection: &PgConnection) {
+    use fresh_cargo::schema::crates::dsl::*;
+    diesel::update(crates.find(crate_id))
         .set(published.eq(true))
-        .get_result::<Crate>(&connection)
-        .expect(&format!("Unable to find crate {}", _crate.id));
+        .get_result::<Crate>(connection)
+        .expect(&format!("Unable to find crate {}", crate_id));
     println!("Published!")
 }
 
