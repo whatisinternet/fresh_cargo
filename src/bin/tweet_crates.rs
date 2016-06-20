@@ -11,6 +11,7 @@ extern crate dotenv;
 use self::fresh_cargo::*;
 use self::fresh_cargo::models::*;
 use self::diesel::prelude::*;
+use self::diesel::pg::PgConnection;
 use self::oauth::Token;
 use std::thread::sleep;
 use std::time::Duration;
@@ -49,17 +50,21 @@ fn main() {
     let access = Token::new(config.access_key, config.access_secret);
 
     for _crate in results {
-        let updated_crate = diesel::update(crates.find(_crate.id))
-            .set(published.eq(true))
-            .get_result::<Crate>(&connection)
-            .expect(&format!("Unable to find crate {}", _crate.id));
-        let status = &*build_tweet(updated_crate);
+        let status = &*build_tweet(_crate);
         sleep(Duration::from_millis(500));
         match twitter::update_status(&consumer, &access, status) {
-            Ok(v) => println!("Tweeted!"),
+            Ok(v) => publish_crate(_crate, &connection),
             Err(e) => println!("FAILED"),
         };
     }
+}
+
+fn publish_crate(_crate: Crate, connection: &PgConnection) {
+    diesel::update(crates.find(_crate.id))
+        .set(published.eq(true))
+        .get_result::<Crate>(&connection)
+        .expect(&format!("Unable to find crate {}", _crate.id));
+    println!("Published!")
 }
 
 fn build_tweet(crate_struct: Crate) -> String {
