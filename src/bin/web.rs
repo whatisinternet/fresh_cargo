@@ -32,6 +32,7 @@ fn index(_: &mut Request) -> IronResult<Response> {
     use fresh_cargo::schema::crates::dsl::*;
     let connection = establish_connection();
     let results = crates.load::<Crate>(&connection)
+        .limit(50);
         .expect("Error loading crates");
 
     let encodeable_crate = EncodeableCrates { crate_object: results };
@@ -48,6 +49,7 @@ fn feed(_: &mut Request) -> IronResult<Response> {
     use fresh_cargo::schema::crates::dsl::*;
     let connection = establish_connection();
     let results = crates.load::<Crate>(&connection)
+        .limit(50);
         .expect("Error loading crates");
     let encodeable_crate = EncodeableCrates { crate_object: results };
     let mut resp = Response::new();
